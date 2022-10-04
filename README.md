@@ -82,3 +82,22 @@
   - here you can use a special prop known as .children/ props.children to pass the data
   - > name of prop can be anything.
   - > you can pass class name as a prop as well and then append it to another string in jsx and use all the classes that you want to.
+
+- ## Event Handling
+    - You can pass events as props to the jsx code and they work like they're supposed to.
+    - A lot of these events like onClick are suupported by React.
+    - You can call an onClick event on JSX code by mentioning the name the of the function in the prop key value.
+    - ````javascript
+       <button onClick={functionName}></button>
+
+       <button onClick={()=>{console.log("clicked")}}></button>
+
+
+        //note that writing some thing like:
+
+        <button onClick={functionName()}></button>
+        //Will cause problems beacuse JSX is java script and this function will end up executing during the complilation of jsx code.
+        //Instead just passing the name of the function is enough and React will handle the rest.
+
+           
+        ````
