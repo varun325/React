@@ -126,7 +126,9 @@
 
   - ```javascript
     const [title, changeTitle] = useState(props.title);
-    //this will take the value of props.title and //return a variable as well as a function to change that variable, which we can name accordingly
+    //this will take the value of props.title and 
+    //return a variable as well as a function to
+    //change that variable, which we can name accordingly
 
     const clickHandler = () => {
       setTitle("checked");
