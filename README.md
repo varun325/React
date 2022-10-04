@@ -49,3 +49,8 @@
     - Add the key value pairs as `key={value}` in the jsx code where we're calling the component
     - Use the props.key as values in the component's function code.
     - Props can be passed down from components to sub components which sometimes will decrease the complexity
+- ## Composition
+    - you may create a component which instead of props takes elements or data as value inside the opening and closing element tags.
+    - here you can use a special prop known as .children/ props.children to pass the data
+    - > name of prop can be anything.
+    - > you can pass class name as a prop as well and then append it to another string in jsx and use all the classes that you want to.
