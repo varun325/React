@@ -48,3 +48,4 @@
     - add props as an argument in the function code for the component.
     - Add the key value pairs as `key={value}` in the jsx code where we're calling the component
     - Use the props.key as values in the component's function code.
+    - Props can be passed down from components to sub components which sometimes will decrease the complexity
