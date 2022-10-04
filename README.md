@@ -1,4 +1,4 @@
-## Repository for the revision and practice of all the fundamental important React concepts
+## Repository for the revision and practice of all the fundamental and important React concepts
 
 ## Initial overview
 
