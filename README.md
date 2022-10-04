@@ -123,12 +123,25 @@
 
   - This useState is a React Hook, one of the Many hooks
   - To use this state you can pass the value of a variable that can be the default value of this state variable, the useState function this then return two values which can be passed into an array and used later in the future.
+
   - ```javascript
     const [title, changeTitle] = useState(props.title);
-    //this will take the value of props.title and return and variable as well as function to change that variable, which we can name accordingly
+    //this will take the value of props.title and //return a variable as well as a function to change that variable, which we can name accordingly
+
+    const clickHandler = () => {
+      setTitle("checked");
+    };
     ```
+
   - For simplicity we'll just call this the changeState function for this documentation
   - Calling changeState funciton till not only change the value of this returned variable, but it will also tell React to re-render all the components where this variable was used/registered.
+  - When a component is being rendered, React registers the state after seeing the useState function
+  - So, each copy of this component will have it's own state being managed by React.
+  - When the changeState function is called, the particular instance will be re-rendered.
+  - const works in case of the state variable and is changing because we're not exactly saving the actual value of something in the variable, but react uses it to some internal process to know which value to load instead of this const.
+  - The default value passed into the useState hook is only considered when Component is rendered for the very first time
+  - When the next time the state in re rendered due to change in state due to changeState function, React will only use the new value.
+  - States can be updated in many ways and not just a click event.
 
 - ## Hooks
   - Like useState there are many other React hooks
