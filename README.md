@@ -1,10 +1,12 @@
-## Repository for the revision and  practice of all the fundamental important React concepts
+## Repository for the revision and practice of all the fundamental important React concepts
+
 ## Initial overview
+
 - node js is a JS framework that can run JS outside of a browser.
 - The easy way to create a react project would be to use Create React App
-    - `npx create-react-app my-app`
-    - `cd my-app`
-    - `npm start`
+  - `npx create-react-app my-app`
+  - `cd my-app`
+  - `npm start`
 - using create react app and node js can help us in dynamically checking changes we've made in the code being rendered into the browser
 - it also helps in optimizing steps in the end as well.
 - react dom and react are both part of the react library
@@ -15,42 +17,68 @@
 - App is also just a function which has some HTML which we're exporting outside.
 
 - ## What is JSX?
-    - JavaScript and XML
-    - HTML is technically just XML
-    - And React behind the scenes can do some transformations and understand the HTML code or well atleast process it.
-    - if you search for your component written in JSX in the sources in inspect, you'll see the transformed form of the code that react has generated.
-    - In JSX, inside the `{}` we can do basic java script expressions
+
+  - JavaScript and XML
+  - HTML is technically just XML
+  - And React behind the scenes can do some transformations and understand the HTML code or well atleast process it.
+  - if you search for your component written in JSX in the sources in inspect, you'll see the transformed form of the code that react has generated.
+  - In JSX, inside the `{}` we can do basic java script expressions
+  - In previous versin of React projects, we had to import react in every file that used jsx, now with modern projects craeted by create-react-app, we don't have to do that anynmore.
+  - Under the hood, when we return a function in jsx, the React.createElement function is called and the elements are passed in it's argumnet with a supposedly infinite list.
+  - ````javascript
+        return (
+        <div>
+            <h2>"hello"</h2>
+            <Expenses items={expenses}/>
+        </div>
+        );
+
+        // is basically something like this:
+
+        return React.createElement(
+                'div',
+                {}, // some attribute of this element
+                React.createElement('h2',{},"hello!"), //chld element
+                React.createElement(Expenses,{items:expenses},)
+        );
+
+        //This is the under the hood code that React is using
+        //And modern projects can use these methods inherently without mentioning.
+
+    ````
+    - The above example also shows why in React and jsx, there can be only one parent wrapper element before returning.
+
 - ## How React works?
-    - In react we create components
-    - We declare these components.
-    - You can use components directly as XML tags inside the html code of the App component.
-        - you need to import the components first.
-    - There must only be one root component
-    - Just add a css file and import it if you need one
-    - as class is a reserved word in JS, when you use it in JSX, you have to use className instead.
-    - You may use a function as many times as needed.
+  - In react we create components
+  - We declare these components.
+  - You can use components directly as XML tags inside the html code of the App component.
+    - you need to import the components first.
+  - There must only be one root component
+  - Just add a css file and import it if you need one
+  - as class is a reserved word in JS, when you use it in JSX, you have to use className instead.
+  - You may use a function as many times as needed.
 - > Manual DOM manipulation gets very cumbersome, React makes it easy for everyone
 - ## Common conventions
-    - Use pascal case and same name as the function inside for file name
-    - React thinks that Lower case elements are default HTML elements and Upper case elements are custom elements created by the developer.
+  - Use pascal case and same name as the function inside for file name
+  - React thinks that Lower case elements are default HTML elements and Upper case elements are custom elements created by the developer.
 - ## Simple order
-    - create a component
-    - import a component
-    - use a component
+  - create a component
+  - import a component
+  - use a component
 - ## Why components?
-    - reusability
-    - Separations of concerns
-    - Don't repeate youself
-    - Don't do too many thing in one and the same place.
-    - Split big chunks of code into multiple smaller functions.
+  - reusability
+  - Separations of concerns
+  - Don't repeate youself
+  - Don't do too many thing in one and the same place.
+  - Split big chunks of code into multiple smaller functions.
 - ## Props
-    - In react you can pass data using props
-    - add props as an argument in the function code for the component.
-    - Add the key value pairs as `key={value}` in the jsx code where we're calling the component
-    - Use the props.key as values in the component's function code.
-    - Props can be passed down from components to sub components which sometimes will decrease the complexity
+  - In react you can pass data using props
+  - add props as an argument in the function code for the component.
+  - Add the key value pairs as `key={value}` in the jsx code where we're calling the component
+  - Use the props.key as values in the component's function code.
+  - Props can be passed down from components to sub components which sometimes will decrease the complexity
 - ## Composition
-    - you may create a component which instead of props takes elements or data as value inside the opening and closing element tags.
-    - here you can use a special prop known as .children/ props.children to pass the data
-    - > name of prop can be anything.
-    - > you can pass class name as a prop as well and then append it to another string in jsx and use all the classes that you want to.
+  - you may create a component which instead of props takes elements or data as value inside the opening and closing element tags.
+  - here you can use a special prop known as .children/ props.children to pass the data
+  - > name of prop can be anything.
+  - > you can pass class name as a prop as well and then append it to another string in jsx and use all the classes that you want to.
