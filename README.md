@@ -101,3 +101,12 @@
 
            
         ````
+- ## How are components handled in React?
+    - The componets are mostly placeholders for function calls in the JSX
+    - While parsing React will take each component one by one and try to parse and render them and will turn keep going through the hole hierarchy and render everything by calling these component functions.
+    - But react will do all this exactly once, which in turn means that just because we have an onclick event added that changes the value which was used as prop to render something, that doesn't mean that change will be represented live on the UI, because the rendering happened only once, that was initially.
+        - > Question: So, how can we deal with such issues? Everyone wants a dynamic website, right?
+        - > Answer: STATES!!
+
+- ## State
+    - 
