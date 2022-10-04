@@ -1,1 +1,14 @@
 ## Repository the use and practice all the fundamental important React concepts
+- node js is a JS framework that can run JS outside of a browser.
+- The easy way to create a react project would be to use Create React App
+    - `npx create-react-app my-app`
+    - `cd my-app`
+    - `npm start`
+- using create react app and node js can help us in dynamically checking changes we've made in the code being rendered into the browser
+- it also helps in optimizing steps in the end as well.
+- react dom and react are both part of the react library
+- import reactDom is a function coming from react dom
+- createRoot is creating the main hook or anchor point fo the app which tells where everything should be placed.
+- now on this object we can call the render function to tell what we're going to render here.
+- App in the end is a component, which will be rendered inside of the element that is there in the index.html file with that id.
+- App is also just a function which has some HTML which we're exporting outside.
