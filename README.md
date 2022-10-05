@@ -149,7 +149,7 @@
 
   - ```javascript
     // if you have multiple variable which need state update, you could ideally call three different hooks to achieve that and that is completely fine.
-
+    //This in a way binds all of these variable's states into one state and change in one will require change in all.
     //But in case you want to do it using a single useState hook, you could do sommething like this:
 
     const [userInput, setUserInput] = useState({
@@ -178,6 +178,10 @@
 
     //here React will make sure that this function gets executed instantaneously
     ```
+
+- ## Two way binding
+  - Two way binding is simple, just add the state variable back as value to a form input
+  - This makes sure that on updating the states, the changes are reflected back on the UI
 
 - ## Hooks
   - Like useState there are many other React hooks
