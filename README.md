@@ -193,13 +193,15 @@
   -
 
 - ## Sending data upwards/ from child to parent component
+
   - While the name sounds somewhat misleading, it's actually simple.
   - In javascript, the functions are bounded with the variables in their lexicographical parent as closures.
   - So, if one is to create a function and send it to child component through a prop and then execute the function in the child component, the changes will be reflected in the variable in the parent because it's reference was sent in the closure alongside the function to the prop.
   - One can leverage this to make changes in variables sent by the parent along with the functions and in a way send data upwards.
 
 - ## Controlled Component
+
   - Sending a value upwards to the parent and then sending the same value downwards back to children results into the creation of controlled component.
-  - Both the value and function are in parent component and child component is just an actor. 
+  - Both the value and function are in parent component and child component is just an actor.
 
 - > A component without a state is known as a presentational or dumb component.
