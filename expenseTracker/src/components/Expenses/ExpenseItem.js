@@ -6,7 +6,7 @@ const ExpenseItem = (props) => {
   const [title, setTitle] = useState(props.title);
   const clickHandler = () => {
     setTitle("checked");
-    //Changing the state using the changeState function
+    //Changing the state using the changeState function!
   };
   // {} in jsx can execute JS expressions
   return (
