@@ -126,7 +126,7 @@
 
   - ```javascript
     const [title, changeTitle] = useState(props.title);
-    //this will take the value of props.title and 
+    //this will take the value of props.title and
     //return a variable as well as a function to
     //change that variable, which we can name accordingly
 
@@ -150,3 +150,4 @@
   - Hooks all start with 'use' prefix in small letters
   - These hooks should be called directly inside a component function, not anywhere inside a nested function or something.
     - _There is an exception to this,_
+  -
