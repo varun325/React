@@ -145,7 +145,7 @@
   - When the next time the state in re rendered due to change in state due to changeState function, React will only use the new value.
   - States can be updated in many ways and not just a click event.
 
-- ## Updating multiple states using a sinle useState hook
+- ## Updating multiple states using a single useState hook
 
   - ```javascript
     // if you have multiple variable which need state update, you could ideally call three different hooks to achieve that and that is completely fine.
@@ -180,10 +180,12 @@
     ```
 
 - ## Two way binding
+
   - Two way binding is simple, just add the state variable back as value to a form input
   - This makes sure that on updating the states, the changes are reflected back on the UI
 
 - ## Hooks
+
   - Like useState there are many other React hooks
   - Hooks all start with 'use' prefix in small letters
   - These hooks should be called directly inside a component function, not anywhere inside a nested function or something.
@@ -195,3 +197,9 @@
   - In javascript, the functions are bounded with the variables in their lexicographical parent as closures.
   - So, if one is to create a function and send it to child component through a prop and then execute the function in the child component, the changes will be reflected in the variable in the parent because it's reference was sent in the closure alongside the function to the prop.
   - One can leverage this to make changes in variables sent by the parent along with the functions and in a way send data upwards.
+
+- ## Controlled Component
+  - Sending a value upwards to the parent and then sending the same value downwards back to children results into the creation of controlled component.
+  - Both the value and function are in parent component and child component is just an actor. 
+
+- > A component without a state is known as a presentational or dumb component.
