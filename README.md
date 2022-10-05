@@ -189,3 +189,9 @@
   - These hooks should be called directly inside a component function, not anywhere inside a nested function or something.
     - _There is an exception to this,_
   -
+
+- ## Sending data upwards/ from child to parent component
+  - While the name sounds somewhat misleading, it's actually simple.
+  - In javascript, the functions are bounded with the variables in their lexicographical parent as closures.
+  - So, if one is to create a function and send it to child component through a prop and then execute the function in the child component, the changes will be reflected in the variable in the parent because it's reference was sent in the closure alongside the function to the prop.
+  - One can leverage this to make changes in variables sent by the parent along with the functions and in a way send data upwards.
