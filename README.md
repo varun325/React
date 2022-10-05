@@ -207,24 +207,54 @@
 - > A component without a state is known as a presentational or dumb component.
 
 - ## Rendering a list
+
   - A list can be rendered easily by using the javascript map function
   - ```javascript
-      return (
-        <div>
-          <Card className="expenses">
-            <ExpensesFilter
-              onChangeFilter={filterChangeHandler}
-              selected={filteredYear}
+    return (
+      <div>
+        <Card className="expenses">
+          <ExpensesFilter
+            onChangeFilter={filterChangeHandler}
+            selected={filteredYear}
+          />
+          {props.items.map((expense) => (
+            <ExpenseItem
+              title={expense.title}
+              amount={expense.amount}
+              date={expense.date}
             />
-            {props.items.map((expense) => (
-              <ExpenseItem
-                title={expense.title}
-                amount={expense.amount}
-                date={expense.date}
-              />
-            ))}
-          </Card>
-        </div>
-      );
+          ))}
+        </Card>
+      </div>
+    );
     ```
   - > There should always be a unique id in a group of objects that we're going to render as a list in React, because the way react works, it always adds an element to the end and then re-renders all the other elements and changes their values one by one. Not only is it ineffiecient, it also leads to issues if we end up using state within these items to do something. Having a unique identifier makes sure, that only one item is added and rest of the items don't have to be re-rendered. In other words, react should have a way to indentify that the item it's going to render between a group of items is unique.
+
+- > If a variable depends on a state variable, change in state also re renders components dependent on the variable. The change in a state triggers a re-render and everything that uses a reference of the state directly or indirectly will be re-evaluated.
+- > change in a state triggers the re-evaluation of all the variables and their dependent variables where the state is being used, this will lead to triggering re-rendering of all the components which are using variables from this hierarchy.
+- It's okay to use variables which can save jsx code and then use those variables in the return and keeping the jsx code lean.
+- ```javascript
+  let expensesContent = <p>No content was found</p>;
+  if (filteredExpenses.length > 0) {
+    expensesContent = filteredExpenses.map((expense) => (
+      <ExpenseItem
+        key={expense.id}
+        title={expense.title}
+        amount={expense.amount}
+        date={expense.date}
+      />
+    ));
+  }
+  return (
+    <div>
+      <Card className="expenses">
+        <ExpensesFilter
+          onChangeFilter={filterChangeHandler}
+          selected={filteredYear}
+        />
+        {expensesContent}
+      </Card>
+    </div>
+  );
+  ```
+- 
