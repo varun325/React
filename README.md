@@ -145,6 +145,40 @@
   - When the next time the state in re rendered due to change in state due to changeState function, React will only use the new value.
   - States can be updated in many ways and not just a click event.
 
+- ## Updating multiple states using a sinle useState hook
+
+  - ```javascript
+    // if you have multiple variable which need state update, you could ideally call three different hooks to achieve that and that is completely fine.
+
+    //But in case you want to do it using a single useState hook, you could do sommething like this:
+
+    const [userInput, setUserInput] = useState({
+      enteredTitle: "",
+      enteredDate: "",
+      enteredAmount: "",
+    });
+
+    const titleChangeHandler = (event) => {
+      setUserInput({
+        ...userInput, //spread operator use to get the previous key and value pairs
+        enteredTitle: event.target.value, // overriding this key value pair
+      });
+    };
+
+    //while the above function gets the job done in most cases, as the execution of these functions are not instantaneous
+    // but scheduled, there's a chance that an older snapshot might end up getting used for previous state
+
+    //So whenever the new state depends on previous state, doing something like this is better
+
+    const titleChangeHandler = (event) => {
+      setUserInput((userInput) => {
+        return { ...userInput, enteredTitle: event.target.value };
+      });
+    };
+
+    //here React will make sure that this function gets executed instantaneously
+    ```
+
 - ## Hooks
   - Like useState there are many other React hooks
   - Hooks all start with 'use' prefix in small letters
