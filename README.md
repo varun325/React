@@ -209,7 +209,7 @@
 - ## Rendering a list
   - A list can be rendered easily by using the javascript map function
   - ```javascript
-            return (
+      return (
         <div>
           <Card className="expenses">
             <ExpensesFilter
@@ -226,6 +226,5 @@
           </Card>
         </div>
       );
-    };
     ```
-    - 
+  - > There should always be a unique id in a group of objects that we're going to render as a list in React, because the way react works, it always adds an element to the end and then re-renders all the other elements and changes their values one by one. Not only is it ineffiecient, it also leads to issues if we end up using state within these items to do something. Having a unique identifier makes sure, that only one item is added and rest of the items don't have to be re-rendered. In other words, react should have a way to indentify that the item it's going to render between a group of items is unique.
