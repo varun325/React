@@ -205,3 +205,27 @@
   - Both the value and function are in parent component and child component is just an actor.
 
 - > A component without a state is known as a presentational or dumb component.
+
+- ## Rendering a list
+  - A list can be rendered easily by using the javascript map function
+  - ```javascript
+            return (
+        <div>
+          <Card className="expenses">
+            <ExpensesFilter
+              onChangeFilter={filterChangeHandler}
+              selected={filteredYear}
+            />
+            {props.items.map((expense) => (
+              <ExpenseItem
+                title={expense.title}
+                amount={expense.amount}
+                date={expense.date}
+              />
+            ))}
+          </Card>
+        </div>
+      );
+    };
+    ```
+    - 
