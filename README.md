@@ -257,4 +257,18 @@
       </div>
     );
     ```
-- 
+- ## Styling in React
+  - You can pass style parameters as a javascript object inside the JSX parantheses
+    - ```javascript
+      return (
+        <div className="chart-bar">
+          <div className="chart-bar__inner">
+            <div
+              className="chart-bar__fill"
+              style={{ height: barFillHeight }}
+            ></div>
+          </div>
+          <div className="char-bar__label">{props.label}</div>
+        </div>
+      );
+      ```
