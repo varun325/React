@@ -22,15 +22,15 @@
   font-size: 1rem;
   flex: 1;
   margin: 0 1rem;
-  color: white;
+  color: #fffcf2;
 }
 
 .expense-item__price {
   font-size: 1rem;
   font-weight: bold;
-  color: white;
-  background-color: #40005d;
-  border: 1px solid white;
+  color: #fffcf2;
+  background-color: #EB5E28;
+  border: 1px solid #fffcf2;
   padding: 0.5rem;
   border-radius: 12px;
 }
