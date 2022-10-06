@@ -1,6 +1,11 @@
-## Repository for the revision and practice of all the fundamental and important React concepts
+## Repository for the revision and practice of all the fundamental and important React concepts for 2022
 
-## Initial overview
+# Projects Which are part of the repo
+1. Expense Tracker
+  - ![Alt text](.\project_screenshots\expenseTracker.png "expense tracker")
+  - Makes use of the following concepts States/useState hook, Props, Components, Event Handling, Two Way Binding, Hooks, Sending state from child to parent, passing function poniter to child, Controlled/presentational component, Rendering data,Styling data
+
+## React overview
 
 - node js is a JS framework that can run JS outside of a browser.
 - The easy way to create a react project would be to use Create React App
