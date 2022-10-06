@@ -2,7 +2,7 @@
 
 # Projects Which are part of the repo
 1. Expense Tracker
-  - ![](.\project_screenshots\expenseTracker.png?raw=true "expense tracker")
+  - ![](./project_screenshots/expenseTracker.png?raw=true "expense tracker")
   - Makes use of the following concepts States/useState hook, Props, Components, Event Handling, Two Way Binding, Hooks, Sending state from child to parent, passing function poniter to child, Controlled/presentational component, Rendering data,Styling data
 
 ## React overview
