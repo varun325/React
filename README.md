@@ -233,28 +233,28 @@
 - > If a variable depends on a state variable, change in state also re renders components dependent on the variable. The change in a state triggers a re-render and everything that uses a reference of the state directly or indirectly will be re-evaluated.
 - > change in a state triggers the re-evaluation of all the variables and their dependent variables where the state is being used, this will lead to triggering re-rendering of all the components which are using variables from this hierarchy.
 - It's okay to use variables which can save jsx code and then use those variables in the return and keeping the jsx code lean.
-- ```javascript
-  let expensesContent = <p>No content was found</p>;
-  if (filteredExpenses.length > 0) {
-    expensesContent = filteredExpenses.map((expense) => (
-      <ExpenseItem
-        key={expense.id}
-        title={expense.title}
-        amount={expense.amount}
-        date={expense.date}
-      />
-    ));
-  }
-  return (
-    <div>
-      <Card className="expenses">
-        <ExpensesFilter
-          onChangeFilter={filterChangeHandler}
-          selected={filteredYear}
+  - ```javascript
+    let expensesContent = <p>No content was found</p>;
+    if (filteredExpenses.length > 0) {
+      expensesContent = filteredExpenses.map((expense) => (
+        <ExpenseItem
+          key={expense.id}
+          title={expense.title}
+          amount={expense.amount}
+          date={expense.date}
         />
-        {expensesContent}
-      </Card>
-    </div>
-  );
-  ```
+      ));
+    }
+    return (
+      <div>
+        <Card className="expenses">
+          <ExpensesFilter
+            onChangeFilter={filterChangeHandler}
+            selected={filteredYear}
+          />
+          {expensesContent}
+        </Card>
+      </div>
+    );
+    ```
 - 
