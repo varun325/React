@@ -510,3 +510,25 @@
 
         export default Button;
         ```
+
+      - Dynamic styles can be used in with css modules like:
+      - ```javascript
+        return (
+          <form onSubmit={formSubmitHandler}>
+            {/* <FormControl invalid={!isValid}> */}
+            <div
+              className={`${styles["form-control"]} ${
+                !isValid ? styles.invalid : ""
+              }`}
+            >
+              <label>Course Goal</label>
+              <input type="text" onChange={goalInputChangeHandler} />
+              {/* </FormControl> */}
+            </div>
+            <Button type="submit">Add Goal</Button>
+          </form>
+        );
+        ```
+      - > as hyphen will be considered as a javascript operator, if a class has hyphen in the name, string manipulation with backtick expressions could be used.
+        - ```className={`${styles["form-control"]} ${ !isValid ? styles.invalid : "" }`}```
+      
