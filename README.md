@@ -313,4 +313,174 @@
     - ```javascript
       <div className={`form-control ${!isValid ? "invalid" : ""}`}>
       ```
-  - 
+
+  - _The css files are not scoped, because when everything thing will be packed for web, these files will work throughout the project, this can be problem in large projects where a lot of developers are working._
+
+    - Here are some popular ways to handle this issue:
+
+      - ## Styled components
+
+        - Install styled components in the project
+        - ```bash
+          npm install --save styled-components
+          ```
+        - In styled components, you can import an element using styled.button`` method and then you can add the styles inside the backticks.
+        - You can use &: for any special states of the clas like hover.
+
+          - ```javascript
+            import styled from "styled-components";
+
+            const Button = styled.button`
+              font: inherit;
+              padding: 0.5rem 1.5rem;
+              border: 1px solid #8b005d;
+              color: white;
+              background: #8b005d;
+              box-shadow: 0 0 4px rgba(0, 0, 0, 0.26);
+              cursor: pointer;
+
+              &:focus {
+                outline: none;
+              }
+
+              &:hover,
+              &:active {
+                background: #ac0e77;
+                border-color: #ac0e77;
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.26);
+              }
+            `;
+
+            export default Button;
+            ```
+
+          - This will generate classes on global names dynamically on run time but all these classes will have have unique names.
+          - you can also use dynamic classes with styled components by creating a sepearate component and then appending the dynamic class in it using props.
+          - ```javascript
+             const FormControl = styled.div`
+             margin: 0.5rem 0;
+
+              & label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 0.5rem;
+              }
+
+              & input {
+                display: block;
+                width: 100%;
+                border: 1px solid #ccc;
+                font: inherit;
+                line-height: 1.5rem;
+                padding: 0 0.25rem;
+              }
+
+              & input:focus {
+                outline: none;
+                background: #fad0ec;
+                border-color: #8b005d;
+              }
+
+              &.invalid input {
+                border-color: red;
+                background: salmon;
+              }
+
+              &.invalid label {
+                color: red;
+              }`;
+
+              return (
+                <form onSubmit={formSubmitHandler}>
+                  <FormControl className={`${!isValid ? "invalid" : ""}`}>
+                    <label>Course Goal</label>
+                    <input type="text" onChange={goalInputChangeHandler} />
+                  </FormControl>
+                  <Button type="submit">Add Goal</Button>
+                </form>
+              );
+            };
+
+            ```
+
+          - Another way to handle this would be to use props direclty inside the style part of the styled componenets inside the backticks by utilizing lambda expressions
+          - ```javascript
+             const FormControl = styled.div`
+             margin: 0.5rem 0;
+
+              & label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 0.5rem;
+                color: ${(props) => (props.invalid ? "red" : "black")};
+              }
+
+              & input {
+                display: block;
+                width: 100%;
+                border: 1px solid ${(props) => (props.invalid ? "red" : "#ccc")};
+                background: ${(props) => (props.invalid ? "salmon" : "transparent")};
+                font: inherit;
+                line-height: 1.5rem;
+                padding: 0 0.25rem;
+              }
+
+              & input:focus {
+                outline: none;
+                background: #fad0ec;
+                border-color: #8b005d;
+              }
+
+              &.invalid input {
+                border-color: red;
+                background: salmon;
+              }
+
+              &.invalid label {
+                color: red;
+              }`;
+
+              return (
+                <form onSubmit={formSubmitHandler}>
+                  <FormControl invalid={!isValid}>
+                    <label>Course Goal</label>
+                    <input type="text" onChange={goalInputChangeHandler} />
+                  </FormControl>
+                  <Button type="submit">Add Goal</Button>
+                </form>
+              );
+            };
+
+            ```
+
+          - Media queries can also be directly used in the styled components
+          - ```javascript
+            import styled from "styled-components";
+
+            const Button = styled.button`
+              width: 100%;
+              font: inherit;
+              padding: 0.5rem 1.5rem;
+              border: 1px solid #8b005d;
+              color: white;
+              background: #8b005d;
+              box-shadow: 0 0 4px rgba(0, 0, 0, 0.26);
+              cursor: pointer;
+              @media (min-width: 760px){
+              width: auto; 
+              }
+
+              &:focus {
+                outline: none;
+              }
+
+              &:hover,
+              &:active {
+                background: #ac0e77;
+                border-color: #ac0e77;
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.26);
+              }
+            `;
+
+            export default Button;
+            ```
