@@ -487,11 +487,11 @@
 
     - ## CSS Modules
 
-      - This is a rather simple way to make classes limited to local scope, it using css modules, these can be installe and are support my create react app by default.
-      - Simple rename your css classes to have the suffix .module.css
+      - This is a rather simple way to make classes limited to local scope, it uses css modules, these can be installed and are support by create react app by default.
+      - Simply rename your css classes to have the suffix .module.css
       - import the css class something like `import styles from "./Button.module.css";`
       - Then use the class using the styles object, the styles object will have all the classes in the file as properties.
-      - under the hood it makes classes unique for the particular component on by creating dynamic names for the elements of that component.
+      - Under the hood it makes classes unique for the particular component on by creating dynamic names for the elements of that component.
       - ```javascript
         import React from "react";
         import styles from "./Button.module.css";
