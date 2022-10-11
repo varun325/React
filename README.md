@@ -1,9 +1,11 @@
 ## Repository for the revision and practice of all the fundamental and important React concepts for 2022
 
 # Projects Which are part of the repo
-1. [Expense Tracker](https://varun325.github.io/React/) *<-live link*
-  - ![](./project_screenshots/expenseTracker.png?raw=true "expense tracker")
-  - Makes use of the following concepts States/useState hook, Props, Components, Event Handling, Two Way Binding, Hooks, Sending state from child to parent, passing function poniter to child, Controlled/presentational component, Rendering data,Styling data
+
+1. [Expense Tracker](https://varun325.github.io/React/) _<-live link_
+
+- ![](./project_screenshots/expenseTracker.png?raw=true "expense tracker")
+- Makes use of the following concepts States/useState hook, Props, Components, Event Handling, Two Way Binding, Hooks, Sending state from child to parent, passing function poniter to child, Controlled/presentational component, Rendering data,Styling data
 
 ## React overview
 
@@ -263,6 +265,7 @@
     );
     ```
 - ## Styling in React
+
   - You can pass style parameters as a javascript object inside the JSX parantheses
     - ```javascript
       return (
@@ -277,3 +280,37 @@
         </div>
       );
       ```
+
+- ## Dynamic styling in react
+
+  - ## Inline Styling
+
+    - We can use inline styling in react using the style prop and passing the style object with conditonal logic.
+    - ```javascript
+      return (
+        <form onSubmit={formSubmitHandler}>
+          <div className="form-control">
+            <label style={{ color: !isValid ? "red" : "black" }}>
+              Course Goal
+            </label>
+            <input
+              type="text"
+              style={{
+                borderColor: !isValid ? "red" : "black",
+                background: !isValid ? "salmon" : "transparent",
+              }}
+              onChange={goalInputChangeHandler}
+            />
+          </div>
+          <Button type="submit">Add Goal</Button>
+        </form>
+      );
+      ```
+
+  - ## Dynamic classes
+
+    - Classes can also be added dynamimcally by using the backtick expressions and injection strings in them based on conditional logic using `${}`
+    - ```javascript
+      <div className={`form-control ${!isValid ? "invalid" : ""}`}>
+      ```
+  - 
