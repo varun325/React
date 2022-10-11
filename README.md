@@ -314,7 +314,7 @@
       <div className={`form-control ${!isValid ? "invalid" : ""}`}>
       ```
 
-  - _The css files are not scoped, because when everything thing will be packed for web, these files will work throughout the project, this can be problem in large projects where a lot of developers are working._
+  - ## The css files are not scoped, because when everything thing will be packed for web, these files will work throughout the project, this can be problem in large projects where a lot of developers are working.
 
     - Here are some popular ways to handle this issue:
 
@@ -466,8 +466,8 @@
               background: #8b005d;
               box-shadow: 0 0 4px rgba(0, 0, 0, 0.26);
               cursor: pointer;
-              @media (min-width: 760px){
-              width: auto; 
+              @media (min-width: 760px) {
+                width: auto;
               }
 
               &:focus {
@@ -484,3 +484,28 @@
 
             export default Button;
             ```
+
+      - ## CSS Modules
+
+        - This is a rather simple way to do it using css modules, these can be installe and are support my create react app by default.
+        - Simple rename your css classes to have the suffix .module.css
+        - import the css class something like `import styles from "./Button.module.css";`
+        - Then use the class using the styles object, the styles object will have all the classes in the file as properties.
+        - ```javascript
+          import React from "react";
+          import styles from "./Button.module.css";
+
+          const Button = (props) => {
+            return (
+              <button
+                type={props.type}
+                className={styles.button}
+                onClick={props.onClick}
+              >
+                {props.children}
+              </button>
+            );
+          };
+
+          export default Button;
+          ```
