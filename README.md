@@ -531,4 +531,10 @@
         ```
       - > as hyphen will be considered as a javascript operator, if a class has hyphen in the name, string manipulation with backtick expressions could be used.
         - ```className={`${styles["form-control"]} ${ !isValid ? styles.invalid : "" }`}```
+
+- ## Debugging in React
+  - Errors can be seen in the npm console.
+  - Errors can be seen on the webpage itself.
+  - Chrome breakpoints can be used in the chrome dev tools.
+  - React dev tools extension can be installed as well for debugging.
       
