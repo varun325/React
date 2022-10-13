@@ -530,11 +530,53 @@
         );
         ```
       - > as hyphen will be considered as a javascript operator, if a class has hyphen in the name, string manipulation with backtick expressions could be used.
-        - ```className={`${styles["form-control"]} ${ !isValid ? styles.invalid : "" }`}```
+        - `` className={`${styles["form-control"]} ${ !isValid ? styles.invalid : "" }`} ``
 
 - ## Debugging in React
   - Errors can be seen in the npm console.
   - Errors can be seen on the webpage itself.
   - Chrome breakpoints can be used in the chrome dev tools.
   - React dev tools extension can be installed as well for debugging.
-      
+- ## JSX Limitations
+
+  - You can't have more than one root level elements.
+    - Which makes sense because you can't return more than one value in JS
+    - One way to work around this issue is to use a Wrapping div or any other element.
+      - Because that makes sure that there is only one returning value.
+    - An alternate way to deal with it would be to return an array of jsx elements
+      - ```javascript
+        return [<Component1 />, <Component2 />];
+        ```
+      - This works but needs unique keys to avoid errors on runtime.
+      - This is a possible solution but isn't preffered because it's too cumbersome to handle.
+  - ## Thus handling this leads to a new problem: DIV soup
+
+    - In your final dom that's returned to the end user, there can be too many divs
+    - It can break your style
+
+      - It's not a good practice
+      - It's also making your application slower because you're rendering unnecessary content.
+      - ## Wrapper component
+
+        - Creating a Wraper component instead of <div> can be one way to deal with it.
+        - ```javascript
+          const Wrapper = (props) => {
+            return props.children;
+          };
+          export default Wrapper;
+          ```
+        - ```javascript
+          return (
+            <Wrapper>
+              <h1></h1>
+              <Component />
+            </Wrapper>
+          );
+          ```
+
+      - ## Fragment
+        - Because this wrapper is so useful, React gives us one by default and that is known as Fragment
+        - There can be two ways to use fragments, one is by using ```<React.Fragment><React.Fragment>``` and another is by using ```<></>```
+        - ```<></>``` might not work for some projects depending upon the project setup.
+
+
