@@ -554,29 +554,336 @@
     - In your final dom that's returned to the end user, there can be too many divs
     - It can break your style
 
-      - It's not a good practice
-      - It's also making your application slower because you're rendering unnecessary content.
-      - ## Wrapper component
+    - It's not a good practice
+    - It's also making your application slower because you're rendering unnecessary content.
+    - ## Wrapper component
 
-        - Creating a Wraper component instead of <div> can be one way to deal with it.
-        - ```javascript
-          const Wrapper = (props) => {
-            return props.children;
-          };
-          export default Wrapper;
-          ```
-        - ```javascript
+      - Creating a Wraper component instead of <div> can be one way to deal with it.
+      - ```javascript
+        const Wrapper = (props) => {
+          return props.children;
+        };
+        export default Wrapper;
+        ```
+      - ```javascript
+        return (
+          <Wrapper>
+            <h1></h1>
+            <Component />
+          </Wrapper>
+        );
+        ```
+
+    - ## Fragment
+      - Because this wrapper is so useful, React gives us one by default and that is known as Fragment
+      - There can be two ways to use fragments, one is by using ```<React.Fragment><React.Fragment>``` and another is by using ```<></>```
+      - ```<></>``` might not work for some projects depending upon the project setup.
+
+- ## React portals
+  - Rect portals can be used to render a component somewhere else other than parent of the component, it can be especially useful when you are creating a component based on some condition but it has to be added in a different node in the dom tree. For example clicking a button in a deeply nested component and creating an alert box directly inside the body.
+    - ```jsx
+        import React from 'react';
+      import ReactDOM from 'react-dom';
+
+      function Modal(props) {
+        if (!props.isOpen) {
+          return null;
+        }
+
+        return ReactDOM.createPortal(
+          <div className="modal">
+            <div className="modal-content">{props.children}</div>
+          </div>,
+          document.body
+        );
+      }
+
+      function App() {
+        const [showModal, setShowModal] = React.useState(false);
+
+        const toggleModal = () => setShowModal(!showModal);
+
+        return (
+          <div>
+            <button onClick={toggleModal}>Show Modal</button>
+            <Modal isOpen={showModal}>
+              <h2>Hello, World!</h2>
+              <button onClick={toggleModal}>Close Modal</button>
+            </Modal>
+          </div>
+        );
+      }
+
+      ReactDOM.render(<App />, document.getElementById('root'));
+      ```
+- ## useRef hook
+  - useRef hook can be used when one needs to access the value of an event, input or a variable without re-rendering the page/component. Also, while just accessing the value of a state won't cause any re-renders, if the state variable is deeply nested or is part of a large array, it can stil lead to performance issues.
+  - if you use a ref to manage a component and make changes to dom directly using the ref, that component becomes an uncontrolled component because instead of react you're managing it using ref and dom manipulation.
+  - ```jsx
+        import React, { useState, useRef } from 'react';
+
+    function App() {
+      const [textState, setTextState] = useState('');
+      const inputRef = useRef(null);
+
+      const handleFocus = () => {
+        inputRef.current.value = 'Focused!';
+        console.log(inputRef.current.value); // logs 'Focused!'
+      };
+
+      const handleInputChange = (event) => {
+        setTextState(event.target.value);
+        console.log(textState); // logs the previous value of textState, doesn't update immediately
+      };
+
+      return (
+        <div>
+          <input
+            id="my-input"
+            type="text"
+            ref={inputRef}
+            onFocus={handleFocus}
+            onChange={handleInputChange}
+          />
+        </div>
+      );
+    }
+    ```
+- # What is the main job of React or any other Single Page Front End Framework?
+> React to the user input and react accordingly
+  - Apart from the main job, everything else is a side job, for example: things like http requests, storing data in broswer cache or anything else which isn't part of the rendering logic.These tasks must happen outside of the normal component evaluation and render cycle, especially since they can block/delay the rendering
+- ## useEffect hook
+  - Functionalities which are not part of the reactions to the user interaction or direct change in the components are side effects, these side effects should not be part of the normal react code as they can delay the rendering process.
+  - For example, an http request which is calling a large amount of data should be a side effect as if it is called everytime the component reloads it will add too much overhead on the network traffic and compute, also it's a wasting resources when nothing has changed in the result of the http call and call is being made regardless.
+  - By using the useEffect hook, we can use an array of refrences or state variables, if the values of these variables change, the effect will be called. We can destructure objects and mention their properties to make sure that the effects take place on a much granular level.
+    - ```jsx
+      import React, { useState, useEffect } from 'react';
+
+      function App() {
+        const [data, setData] = useState(null);
+        const [toggle, setToggle] = useState(false);
+
+        useEffect(() => {
+          fetch('https://jsonplaceholder.typicode.com/todos/1')
+            .then((response) => response.json())
+            .then((data) => setData(data));
+        }, [toggle]);
+
+        const handleToggle = () => {
+          setToggle(!toggle);
+        };
+
+        if (!data) {
+          return <div>Loading...</div>;
+        }
+
+        return (
+          <div>
+            <h1 onClick={handleToggle}>{data.title}</h1>
+            <p>{data.completed ? 'Completed' : 'Not completed'}</p>
+          </div>
+        );
+      }
+      ```
+ - ## Debouncing
+    - Updating a state or calling an effect everytime the data in a field changes can be taxing for many reasons.
+      Imagine the user is typing a long user name or something, and for that we're making an asynchronous call in the background which can achieve some particular task in the background like searching a database or something similar, if user types 200 characters and everytime a character is typed, we search the database, it's going to be too many calls and hence a very high overhead over the system.
+    - In such a scenario, one can use debouncing, that is instead of calling the effect for everystate change, have a delay before the next call can be made.
+    - ```jsx
+          import React, { useState, useEffect } from 'react';
+
+      function SearchBox() {
+        const [searchTerm, setSearchTerm] = useState('');
+        const [searchResults, setSearchResults] = useState([]);
+
+        useEffect(() => {
+          const debounceTimeout = setTimeout(() => {
+            // Call the search function after a delay of 500ms
+            searchDatabase(searchTerm);
+          }, 500);
+
+          // Clear the timeout if the component is unmounted or if the search term changes
+          return () => clearTimeout(debounceTimeout);
+        }, [searchTerm]);
+
+        const handleSearchTermChange = (event) => {
+          setSearchTerm(event.target.value);
+        };
+
+        const searchDatabase = (term) => {
+          // Send a search request to the server and update the search results
+          // ...
+          setSearchResults(searchResults);
+        };
+
+        return (
+          <div>
+            <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
+            <ul>
+              {searchResults.map((result) => (
+                <li key={result.id}>{result.title}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+      ```
+    - Here, the delay gives the user some time to type before the database search call is made.
+    - The cleanup call will be made before the debounce call every single time.
+
+- ## useReducer hook
+  - This hook is used to manage more complex state logic while keeping the overall code simple.
+  - You define a reducer and an initial state and based on different action types, different actions will be taken.
+  - ```jsx
+      import React, { useReducer } from 'react';
+
+      const initialState = { count: 0 };
+
+      function reducer(state, action) {
+        switch (action.type) {
+          case 'increment':
+            return { count: state.count + 1 };
+          case 'decrement':
+            return { count: state.count - 1 };
+          case 'reset':
+            return { count: 0 };
+          default:
+            throw new Error();
+        }
+      }
+
+      function Counter() {
+        const [state, dispatch] = useReducer(reducer, initialState);
+
+        return (
+          <div>
+            <p>Count: {state.count}</p>
+            <button onClick={() => dispatch({ type: 'increment' })}>Increment</button>
+            <button onClick={() => dispatch({ type: 'decrement' })}>Decrement</button>
+            <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+          </div>
+        );
+      }
+      ```
+- ## Object restructuring
+  - It is an important concept which we can use to extract specific properties of an object in javascript.
+  - ```javascript
+        const user = {
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        age: 30,
+        address: {
+          city: 'New York',
+          state: 'NY',
+          country: 'USA'
+        }
+      };
+
+      // Object restructuring
+      const { name, email, age, address: { city, state, country } } = user;
+
+      console.log(name);      // Output: 'John Doe'
+      console.log(email);     // Output: 'johndoe@example.com'
+      console.log(age);       // Output: 30
+      console.log(city);      // Output: 'New York'
+      console.log(state);     // Output: 'NY'
+      console.log(country);   // Output: 'USA'
+    ```
+- ## useState vs useReducer
+  - For a simple single type of operation, using useState makes much more sense as it's just simple. But when you need to perform multiple kinds of operations on the same state, that is complex state management, it's much better to use the useReducer hook.
+
+- ## React Context API
+  - Context API is a way to pass state along without using props from one component to another which are not directly related.
+  - > Context API is good for managing state at a smaller scale but for state that might change at high frequency, context api is not optimal.
+  - ## Creating Provider
+    - ```jsx
+        // App.js
+        import React from 'react';
+        import Child from './Child';
+
+        export const MyContext = React.createContext('default value');
+
+        function App() {
           return (
-            <Wrapper>
-              <h1></h1>
-              <Component />
-            </Wrapper>
+            <MyContext.Provider value="hello world">
+              <Child />
+            </MyContext.Provider>
           );
+        }
+
+        export default App;
+        ```
+  - ## Creating Consumer
+    - ```jsx
+         // Child.js
+        import React from 'react';
+        import { MyContext } from './App';
+
+        function Child() {
+          return (
+            <MyContext.Consumer>
+              {value => <p>{value}</p>}
+            </MyContext.Consumer>
+          );
+        }
+
+        export default Child;
+        ```
+  - By wrapping a parent level component in the Provider component, all its descendants will be able to access the value property if they are wrapped in the Consumer component.
+- ## useContext hook
+  - Instead of wrapping the child components in the Consumer component, we can make use of the useContext hook.
+    - ```jsx
+        // Child.js
+        import React, { useContext } from 'react';
+        import { MyContext } from './App';
+
+        function Child() {
+          const value = useContext(MyContext);
+          return <p>{value}</p>;
+        }
+
+        export default Child;
+        ```
+- ## Rules of hooks
+  1. Call react hooks only in React functions
+    - React component functions/ context api functions
+    - Custom hooks.
+  2. Don't call hooks in nested functions or nested blocks. Only call them on the top level of the function you're exporting/ top level of a component.
+  3. useEffect hook : Everything being used inside the useEffect hooks should be a dependency of the useEffect hook unless there is a really specific reason for it.
+
+- ## Forward Refs
+  > Avoid the use of the below at all costs unless a special scenario occurs.
+  > Like focusing on a particular email validation based on something specific etc using react
+
+  - ## useImperativeHandler hook and React.forwardRef
+    - These two can be used in cobination to forward a ref, and use the reference of child from parent and vice versa because useImperativeHandler can bind them.
+    - ```jsx
+          import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+          const Input = forwardRef((props, ref) => {
+            const inputRef = useRef(null);
+
+            useImperativeHandle(ref, () => ({
+              focus: () => {
+                inputRef.current.focus();
+              }
+            }));
+
+            return <input type="text" ref={inputRef} />;
+          });
+
+          function App() {
+            const inputRef = useRef(null);
+
+            const handleClick = () => {
+              inputRef.current.focus();
+            };
+
+            return (
+              <div>
+                <button onClick={handleClick}>Focus Input</button>
+                <Input ref={inputRef} />
+              </div>
+            );
+          }
           ```
-
-      - ## Fragment
-        - Because this wrapper is so useful, React gives us one by default and that is known as Fragment
-        - There can be two ways to use fragments, one is by using ```<React.Fragment><React.Fragment>``` and another is by using ```<></>```
-        - ```<></>``` might not work for some projects depending upon the project setup.
-
-
+- 
