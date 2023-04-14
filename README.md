@@ -853,7 +853,7 @@
 
 - ## Forward Refs
   > Avoid the use of the below at all costs unless a special scenario occurs.
-  > Like focusing on a particular email validation based on something specific etc using react
+  > Like focusing on a particular input during email validation based on something specific etc using react
 
   - ## useImperativeHandler hook and React.forwardRef
     - These two can be used in cobination to forward a ref, and use the reference of child from parent and vice versa because useImperativeHandler can bind them.
