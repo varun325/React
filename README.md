@@ -886,4 +886,276 @@
             );
           }
         ```
-- 
+- ## Optimizations in the React code
+  - ## React supports a virtual DOM
+    - React re-renders the page when there's a change in the state
+    - But react doesn't re-render the whole page, that would be too computationally expensive.
+    - Instead react evalates the current DOM with the DOM that will be created after the state changes.
+    - Based on the difference between the two versions of the DOM, React will only make the necessary changes to convert the DOM to the desired state.
+    - The computation for evaluating and comparing the dom versions is not equal to the computation requried to re-rendering everything.
+    - This is all possible because react supports a virtual DOM which facilitates all of this.
+    - for example:
+    - ```jsx
+      import { useState } from 'react';
+      import './App.css';
+
+      function App() {
+        console.log("app evaluated");
+        const [showParagraph,setShowParagraph] = useState(false);
+
+        const toggleParagraphHandler = ()=>{
+            setShowParagraph(showParagraph => !showParagraph);
+        }
+
+        return (
+          <div className="App">
+            <h1>Hi there!</h1>
+            {showParagraph && <p>This is new!</p>}
+            <button onClick={toggleParagraphHandler}>toggle paragraph</button>
+          </div>
+        );
+      }
+
+      export default App;
+      ```
+    - > Do note that even though the Virtual Dom re-evaluation means that, only the required changes will be re-rendered, it doesn't mean that those components that are in turn javascript functions won't be execute.
+    - In addtion to a state change causing the component with the state to be re-executed, all of it's child component or in other words nested function calls will also be re-executed and this may work in a nested fashion till the most atomic function which doesn't have any nested function calls/ nest components.
+    - But this will also be computationally taxing, so we can use `React.Memo()` to avoid that in case we don't want a child component to be re-evaluated.
+  - ## React.Memo
+    - Now if we were to re-write our code to something like this:
+    - ```jsx
+      //App component
+      import { useState } from 'react';
+      import './App.css';
+      import DemoComponent from './Demo/DemoComponent';
+
+      function App() {
+        const [showParagraph,setShowParagraph] = useState(false);
+
+        const toggleParagraphHandler = ()=>{
+            setShowParagraph(showParagraph => !showParagraph);
+        }
+        console.log("app evaluated");
+        return (
+          <div className="App">
+            <h1>Hi there!</h1>
+            <DemoComponent show={showParagraph}></DemoComponent>
+            <button onClick={toggleParagraphHandler}>toggle paragraph</button>
+          </div>
+        );
+      }
+
+      export default App;
+      ```
+    - ```jsx
+      //Demo Component
+      import {React} from 'react';
+      const DemoComponent = (props)=>{
+          console.log("Demo Evaluated");
+          return <p>{props.show? 'This is new!':''}</p>
+
+      }
+
+      export default DemoComponent;
+      ```
+    - You can notice in the console.log that everytime the state changes the Demo Component is also re-evaluated.
+    - We could make another change to try to avoid this change, right? Let's hardcode the value of show prop to be false
+    - It can be noticed that despite that the Demo component is still being evaluated which makes sense as it's a function call which has to be made if the parent function is executing.
+    - We can use `React.Memo()` to avoid this and avoid the call from being made.
+    - for example:
+    - ```jsx
+      import {React,memo} from 'react';
+      const DemoComponent = (props)=>{
+          console.log("Demo Evaluated");
+          return <p>{props.show? 'This is new!':''}</p>
+
+      }
+      export default memo(DemoComponent);
+      ```
+    - Now, while memo function on it's own already looks useful, there are still issues with it.
+    - First, memo function works by comparing the current prop values of a component with previous prop values to decide if it's going to re-execute the function/ component or not.
+    - for example:
+    - ```jsx
+      //App component
+      import { useState } from 'react';
+      import './App.css';
+      import DemoComponent from './Demo/DemoComponent';
+      import Button from './UI/Button/Button';
+
+      function App() {
+        const [showParagraph,setShowParagraph] = useState(false);
+
+        const toggleParagraphHandler = ()=>{
+            setShowParagraph(showParagraph => !showParagraph);
+        }
+        console.log("app evaluated");
+        return (
+          <div className="App">
+            <h1>Hi there!</h1>
+            <DemoComponent show={showParagraph}></DemoComponent>
+            <Button onClick={toggleParagraphHandler}>Toggle Paragraph</Button>
+          </div>
+        );
+      }
+      export default App;
+      ```
+    - ```jsx
+      import styles from './Button.module.css'
+      const Button = (props)=>{
+      return <button
+      type={props.type || "button"}
+      className={styles.button}
+      onClick={props.onClick}>
+      {props.children}
+      </button>
+      }
+      export default Button;
+      ```
+    - > What does this mean?
+    - When you pass a javascript expression as a prop value with {}, a new version of the prop value will be created and passed to the function as a prop
+    - So, while primitive values like a boolean or number will be evaluated to be same and halt the re-execution, reference values like objects and function( which are also technically objects in javascript) will not be considered same.
+    - There a way to tackle this issue as well, using `useCallBack()` hook.
+    - It doesn't seem to be very computationally smart either to put every function inside memo because then we'll be comparing props for everything, but we can optimally use it in branches where there is a chance of props being the same sometimes and cut off the whole branch of execution itself.
+  - ## useCallBack()
+    - We can wrap our function inside the useCallBack hook and that would save our callback/ function in the memory and prevent any unnecessary recreations of the function which will also allow the use of `memo()` function more often.
+    - Just like `useEffect()` hook, the `useCallBack()` hook also has an array of dependencies
+    - If we don't pass the dependencies in the `useCallBack()`, the required functionality will not occcur.
+    - for example:
+    - ```jsx
+      import { useCallback, useState } from 'react';
+      import './App.css';
+      import DemoComponent from './Demo/DemoComponent';
+      import Button from './UI/Button/Button';
+
+      function App() {
+        const [showParagraph,setShowParagraph] = useState(false);
+        const [allowToggle, setAllowToggle] = useState(false);
+        const toggleParagraphHandler = useCallback(()=>{
+          if(!allowToggle)
+            return;
+          setShowParagraph(showParagraph => !showParagraph);
+        },[]); 
+
+        const allowToggleHandler = ()=>{
+          setAllowToggle(allowToggle=>!allowToggle);
+        }
+
+        console.log("app evaluated");
+        return (
+          <div className="App">
+            <h1>Hi there!</h1>
+            <DemoComponent show={showParagraph}></DemoComponent>
+            <Button onClick={allowToggleHandler}>Allow Toggle</Button>
+            <br/>
+            <Button onClick={toggleParagraphHandler}>Toggle Paragraph</Button>
+          </div>
+        );
+      }
+
+      export default App;
+      ```
+    - And one might think why that is the case, it's because in java script the variables being used with a function and bundled together in a closure and tied together with the funciton, so when the app/ component will re-render if `useCallBack()` allows the use of the old function, the close will still have the old dependencies while our component will have new state variables. So, the array of dependencies helps in deciding whether the state variable dependencies have changed and the function should actually be recreated or not.
+    - So, we need to pass the allowToggle state dependency in our `useCallBack()` hook in our example for our code to work as intended.
+    - for example:
+    - ```jsx
+      import { useCallback, useState } from 'react';
+      import './App.css';
+      import DemoComponent from './Demo/DemoComponent';
+      import Button from './UI/Button/Button';
+
+      function App() {
+        const [showParagraph,setShowParagraph] = useState(false);
+        const [allowToggle, setAllowToggle] = useState(false);
+        const toggleParagraphHandler = useCallback(()=>{
+          if(!allowToggle)
+            return;
+          setShowParagraph(showParagraph => !showParagraph);
+        },[allowToggle]); 
+
+        const allowToggleHandler = ()=>{
+          setAllowToggle(allowToggle=>!allowToggle);
+        }
+
+        console.log("app evaluated");
+        return (
+          <div className="App">
+            <h1>Hi there!</h1>
+            <DemoComponent show={showParagraph}></DemoComponent>
+            <Button onClick={allowToggleHandler}>Allow Toggle</Button>
+            <br/>
+            <Button onClick={toggleParagraphHandler}>Toggle Paragraph</Button>
+          </div>
+        );
+      }
+      export default App;
+      ```
+  - > One might think that everytime a Component re-renders, the `useState()` hook will be called, and thus create a new version of the state which should cause problems. But the react library makes sure that only the first time the component re-renders, the state is created, on the subsequent re-renders the state is only updated as needed.
+  - ## State Scheduling and batching.
+    - Another important concept to note is that in a very high frequency environment where there are a lot of state changes happening on the same state at a given instance of time, there might be some delay in which change occurs when or which function executes first or later.
+    - Because there can be many high priority processes which get executed first by the react library, this may or may not lead to problem.
+    - This delay and scheduling of state changes is known as *state scheduling*
+    - hence it's always better to add a dependency on the previous state for the current state change
+    - hooks like `useEffect()` or `useCallBack()` do it by default.
+    - For regular calls, we could execute our change functions like this:
+    - ```js
+      changeTitleState(title=>!title);
+      ```
+    - By doing something like this where the lambda function has the previous state as a parameter, this would make sure that no matter the order in which state changes execute, we would always have the latest state for use and the states chagnes will always sync properly.
+    - Another important concept to note is the state batching.
+    - This is react library schedules state changes based on priority and internal calculation but it also may change multiple states together in a single state change operations, this is known as *state batching*
+  - ## useMemo()
+    - There will be occassions where you don't want to do a computational task again given your have gotten the same arguments for a function again.
+    - for example sorting:
+    - Let's say we have something like this:
+    - ```jsx
+      //parent component
+      return <SomeCompoenent items={[3,21,4,5,6]}></SomeComponent>
+
+      ```
+    - ```jsx
+      //SomeComponent
+      
+      const SomeComponent = (props)=>{
+
+        const {items} = props;
+
+        const sortedList = items.sort();
+
+        return <ul>
+        sortedList.map((item)=>{
+          <li key={item}>{item}</li>
+        })
+        </ul>
+
+      }
+      export default SomeComponent;
+      ```
+    - Here, we're sorting the list and sorting it everytime doesn't make sense, so just like `useCallBack()` which avoids recreating a function unnecessarily, we have `useMemo()` which avoid executing a piece of code again, so we could write something like this in the child component from our previous example:
+    - ```jsx
+      //SomeComponent
+      const SomeComponent = (props)=>{
+
+        const {items} = props;
+
+        const sortedList = useMemo(()=>{
+          return items.sort(); 
+        },[items]);
+
+        return <ul>
+        sortedList.map((item)=>{
+          <li key={item}>{item}</li>
+        })
+        </ul>
+
+      }
+      export default SomeComponent;
+      ```
+    - But this will again still not work, as just like functions, objects which are being passed as javascript expressions inside the props with {} will be a with a new reference and in a way a shallow copy of the previous object, which means we're passing a new array again, which will not be considered as the same array by the `useMemo()` hook as expected and the sort function will execute again.
+    - To avoid that, we could use `useMemo()` in the parent function as well, to pass the same array to the props
+    - We can refactor the parent function something like this:
+    - ```jsx
+      //parent component
+      return <SomeCompoenent items={useMemo(()=>[3,21,4,5,6],[])}></SomeComponent>
+      ```
+    - And now our function won't execute unnecessarily for the same array being passed.
+- ## Class Based components
