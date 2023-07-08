@@ -32,7 +32,7 @@
   - In JSX, inside the `{}` we can do basic java script expressions
   - In previous versin of React projects, we had to import react in every file that used jsx, now with modern projects craeted by create-react-app, we don't have to do that anynmore.
   - Under the hood, when we return a function in jsx, the React.createElement function is called and the elements are passed in it's argumnet with a supposedly infinite list.
-  - ```javascript
+  - ```jsx
     return (
       <div>
         <h2>"hello"</h2>
@@ -1159,3 +1159,294 @@
       ```
     - And now our function won't execute unnecessarily for the same array being passed.
 - ## Class Based components
+ - Class based components are an alternate way of creating components.
+ - Before react 16.8 and introduction of hooks, class based components were needed to deal with side effects and state management in React.
+ - Even now in many legacy projects, you may see Class based components.
+ - Class based components can't use hooks inside them.
+ - Class based components can use functional components inside their render method i.e they can have functional components as children and the vice-versa is also true.
+ - for example, for a functional component that looks like this:
+ - ```jsx
+    import classes from './User.module.css';
+    const User = (props) => {
+      return <li className={classes.user}>{props.name}</li>;
+    };
+    export default User;
+    ```
+- We can write alternate class based component's equivalent code like this:
+  - ```jsx
+      import classes from './User.module.css';
+      import {Component} from 'react';
+
+      // const User = (props) => {
+      //   return <li className={classes.user}>{props.name}</li>;
+      // };
+
+      class User extends Component{
+        render(){
+          return <li className={classes.user}>{this.props.name}</li>;
+        }
+      }
+
+      export default User;
+    ```
+- the `render()` method is a method we need to override which returns exacly what our functional component is supposed to return.
+- the `render()` method can't take props as a parameter but props exists as a property of the Component class which can be used to achieve the same thing, so instead of props, we're using `this.props`.
+- But it can't use hooks, so we need alternate ways to handle state and side effects.
+- Component class provides `state` property which holds an object as a `setState()` method which can be used to change this state.
+- Look at the below functional component and focus on how we convert it to a class based component.
+- ```jsx
+  //Functional component code
+  import { useState } from 'react';
+  import User from './User';
+
+  import classes from './Users.module.css';
+
+  const DUMMY_USERS = [
+    { id: 'u1', name: 'Max' },
+    { id: 'u2', name: 'Manuel' },
+    { id: 'u3', name: 'Julie' },
+  ];
+
+  const Users = () => {
+    const [showUsers, setShowUsers] = useState(true);
+
+    const toggleUsersHandler = () => {
+      setShowUsers((curState) => !curState);
+    };
+
+    const usersList = (
+      <ul>
+        {DUMMY_USERS.map((user) => (
+          <User key={user.id} name={user.name} />
+        ))}
+      </ul>
+    );
+
+    return (
+      <div className={classes.users}>
+        <button onClick={toggleUsersHandler}>
+          {showUsers ? 'Hide' : 'Show'} Users
+        </button>
+        {showUsers && usersList}
+      </div>
+    );
+  };
+
+  export default Users;
+  ```
+- ```jsx
+    //Class based component
+    import {Component } from 'react';
+    import User from './User';
+    import classes from './Users.module.css';
+
+    const DUMMY_USERS = [
+      { id: 'u1', name: 'Max' },
+      { id: 'u2', name: 'Manuel' },
+      { id: 'u3', name: 'Julie' },
+    ];
+
+    class Users extends Component{
+
+        constructor(){
+          super();
+          this.state = {
+            showUsers : false
+          }
+        }
+
+        usersList = (
+        <ul>
+          {DUMMY_USERS.map((user) => (
+            <User key={user.id} name={user.name} />
+          ))}
+        </ul>
+      );
+
+      toggleUsersHandler(){
+        this.setState(currentState => {
+          return {showUsers : !currentState.showUsers};
+        })
+      }
+
+      render(){
+        return (
+          <div className={classes.users}>
+            <button onClick={this.toggleUsersHandler}>
+              {this.state.showUsers ? 'Hide' : 'Show'} Users
+            </button>
+            {this.state.showUsers && this.usersList}
+          </div>
+        );
+      }
+
+    }
+
+    export default Users;
+  ```
+- The state property provided by the `Component` class is an object
+- Also notice how the `setState()` function accepts an object and we can use a lambda function or any function to fetch the previous state and make changes to that before returning the new state object.
+- One great thing that react thankfully handles for us is that the object you pass to the `setState()` method gets merged with the original state and doesn't replace the original state, which helps us by not making us pass the whole state when the change is only in one property.
+- The `useState()` hook won't merge the state object in case the state is an object for us.
+- But instead the `useState()` hook can make even primitive values as state, which is not possible in the state property of the Component class, so there are pros and cons of the both the methods.
+- *Do remember to use array function for your handler function if you're going to use `this.setState()`*
+- ```jsx
+    toggleUsersHandler = ()=>{
+      this.setState(currentState => {
+        return {showUsers : !currentState.showUsers};
+      })
+    }
+  ```
+- Without using the array function for the toggleUsersProperty the `this` keyword would refer to the function's own context which doesn't have `setState()`
+- Similar problems may arise while dealing with `this.props`
+
+- ## Life Cycle method in Class Based Commponents
+- Just like functional components have `useEffect()` hook to handle any side effects that occur, the class based components have **Life Cycle Methods**
+- the three important life cycle methods are:
+- > `componentDidMount()` equivalent to `useEffect(()=>{//some code here},[])`
+  - In other words, it's similar to having a `useEffect()` hook with empty dependencies array and the code inside will only execute on first render.
+- > `componentDidUpdate()` equivalent to `useEffect(()=>{//some code here},[dependency])`
+  - In other words, it's similar to having a `useEffect()` hook with a dependencies array and whenever there is a change in those state properties, the code inside will re-execute.
+- > `componentWillUnmount()` equivalent to `useEffect(()=>{//some code here return ()=>{//clean up code here} },[])`
+  - In other words, it's similar to the clean up code in the `useEffect()` hook and and executes at the end when the component will unmount.
+- Consider the following functional component which makes use of `useEffect()` hook to handle side effects:
+- ```jsx
+  import { Fragment, useState, useEffect } from 'react';
+  import Users from './Users';
+  import classes from './UserFinder.module.css';
+
+  const DUMMY_USERS = [
+    { id: 'u1', name: 'Max' },
+    { id: 'u2', name: 'Manuel' },
+    { id: 'u3', name: 'Julie' },
+  ];
+
+  const UserFinder = () => {
+    const [filteredUsers, setFilteredUsers] = useState(DUMMY_USERS);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+      setFilteredUsers(
+        DUMMY_USERS.filter((user) => user.name.includes(searchTerm))
+      );
+    }, [searchTerm]);
+
+    const searchChangeHandler = (event) => {
+      setSearchTerm(event.target.value);
+    };
+    
+    return (
+      <Fragment>
+        <div className={classes.finder}>
+          <input type='search' onChange={searchChangeHandler} />
+        </div>
+        <Users users={filteredUsers} />
+      </Fragment>
+    );
+  };
+
+  export default UserFinder;
+  ```
+- We can rewrite it into a equivalent class based component like this:
+- ```jsx
+  import { Fragment, Component } from 'react';
+  import Users from './Users';
+  import classes from './UserFinder.module.css';
+
+  const DUMMY_USERS = [
+    { id: 'u1', name: 'Max' },
+    { id: 'u2', name: 'Manuel' },
+    { id: 'u3', name: 'Julie' },
+  ];
+
+  class UserFinder extends Component{
+
+      constructor(){
+          super();
+          this.state = {
+              filteredUsers: DUMMY_USERS,
+              searchTerm: ''
+          }
+      }
+
+      componentDidUpdate(previousProps,previousState){
+
+          if(previousState.searchTerm===this.state.searchTerm)return;
+
+          this.setState({filteredUsers : DUMMY_USERS.filter(
+              (user) => user.name.includes(this.state.searchTerm)
+              )
+          });
+
+      }
+
+      searchChangeHandler = (event) => {
+          this.setState({searchTerm : event.target.value});
+        };
+
+      render(){
+          return (
+              <Fragment>
+                <div className={classes.finder}>
+                  <input type='search' onChange={this.searchChangeHandler} />
+                </div>
+                <Users users={this.state.filteredUsers} />
+              </Fragment>
+            );
+      }
+
+  }
+
+
+  export default UserFinder;
+  ```
+- Notice that in the `componentDidUpdate()` function, we used two parameters previousProps and previousState
+- Just like useEffect hook has dependencies to keep track of what changes should result as a trigger to re-execute the code inside, these two parameters help us to add checks to make sure that the componentDidUpdate() function runs for the specific state change and makes sure that it doesn't run infinitely as by default, it's `componentDidUpdate()` function will re-execute on every state change and it might cause a state change as well which can lead to an infinite recursion without a base condition.
+- ```jsx
+    componentDidUpdate(previousProps,previousState){
+            //This is the base condition, that will break the possible recursion
+            if(previousState.searchTerm===this.state.searchTerm)return;
+
+            this.setState({filteredUsers : DUMMY_USERS.filter(
+                (user) => user.name.includes(this.state.searchTerm)
+                )
+            });
+
+        }
+  ```
+- Similarly we could add `componentDidMount()` to load the initial data into filteredUsers
+- We could also use `componentWillUnmount()` in the Users component for any cleanup calls.
+- ## Class Based components and context
+- One simple way to use the context in the class based components is to juse wrap the result of the `render()` method in the ContextName.Consumer component.
+  - This method is also superior here as you will be able to use multiple contexts
+- in case you want to use a single context in the class based components, a preferred approach would be to use `static contextType = ContextName;` property of the class based component to bind the context and then use `this.context.<value name here>` and use the desired values.
+- But in a sense the easy approach in the class based component is a bit restrictive making the class based components to appear a bit restrictive.
+- ## Error boundaries in the class based components.
+  - One of the main reasons one might have to use class based components over functional components apart from personal preference or class based components already being used in the project is error boundaries.
+  - Even though the jsx functions are javascript functions under the hood, they're not simple functions and can't be wrapped inside a `try catch` statement. This also means that it would be much harder to elegently deal with erros which we dont' expect in production.
+  - In class based components though, we can use `ErrorBoundary`, it's just another class based component which utilizes the `componentDidCatch` method and if any class based component wrapped inside it throws an error, the state of `this.state.hasError` will change and can help us trigger a smooth transition or error screen.
+  - You can create an ErrorBoundary component like this:
+  - ```jsx
+      import { Component } from "react";
+      class ErrorBoundary extends Component{
+
+          constructor(){
+              super();
+              this.state = {
+                  hasError: false
+              }
+          }
+
+          componentDidCatch(){
+              this.setState({hasError: true});
+          }
+
+          render(){
+              return this.state.hasError?<p>'something went wrong'</p>:this.props.children;
+          }
+
+      }
+
+      export default ErrorBoundary;
+    ```
+  - And thus we can wrap any functions susceptible to errors inside this wrapper and gracefully handle the errors.
