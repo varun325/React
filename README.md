@@ -1450,3 +1450,243 @@
       export default ErrorBoundary;
     ```
   - And thus we can wrap any functions susceptible to errors inside this wrapper and gracefully handle the errors.
+
+- ## HTTP Requests
+- Working in react is under the hood just working in java script, so ofcourse any java script library which can be used for making http requests should work (for example: axios)
+- Modern browsers have access to the fetch api which can also make http requests.
+- for example: following code should be able to fetch an http response and change the state accordingly.
+- ```jsx
+  import  {useState} from 'react';
+  import MoviesList from './components/MoviesList';
+  import './App.css';
+
+  function App() {
+    const [movies, setMovies]  = useState([]);
+    const fetchMoviesHandlder = ()=>{
+
+      fetch('https:/swapi.dev/api/films/').then(
+        response => {return response.json();}
+      ).then(
+        data => {
+            const transformedMovies = data.results.map(
+              movieData => {
+                return {
+                  id: movieData.episode_id,
+                  title: movieData.title,
+                  openingText: movieData.opening_crawl,
+                  releaseDate: movieData.release_date
+                }
+              }
+            );
+            setMovies(transformedMovies);
+        }
+      )
+    }
+
+    return (
+      <>
+        <section>
+          <button onClick={fetchMoviesHandlder}>Fetch Movies</button>
+        </section>
+        <section>
+          <MoviesList movies={movies} />
+        </section>
+      </>
+    );
+  }
+
+  export default App;
+
+  ```
+- We can also rewrite the function to use async await:
+- ```jsx
+  const fetchMoviesHandlder = async ()=>{
+    const response = await fetch('https:/swapi.dev/api/films/');
+    const data = await response.json();
+    const transformedMovies = data.results.map(
+      movieData => {
+        return {
+          id: movieData.episode_id,
+          title: movieData.title,
+          openingText: movieData.opening_crawl,
+          releaseDate: movieData.release_date
+        }
+      }
+    );
+    setMovies(transformedMovies);
+
+  }
+  ```
+- ## Error handling for http error
+- Libraries like axios will throw an error in case there's an error http response code.
+- This won't happen on it's own in case of the fetch api
+- We can throw an error manually in that case bassed on the value of `response.ok` or by reading the response code itself.
+- In case we're using `.then()`, we can catch the errors using `.catch()`, in case of `async await`, we can use the try catch method instead.
+- for example:
+- ```jsx
+    import  {useState} from 'react';
+    import MoviesList from './components/MoviesList';
+    import './App.css';
+
+    function App() {
+      const [movies, setMovies]  = useState([]);
+      const [loading,setLoading] = useState(false);
+      const [error, setError] = useState(null);
+      const fetchMoviesHandlder = async ()=>{
+        setLoading(true);
+
+        try{
+          setError(null);
+          const response = await fetch('https:/swapi.dev/api/films/');
+          if(!response.ok){
+            throw new Error('Something went wrong!');
+          }
+          const data = await response.json();
+          const transformedMovies = data.results.map(
+            movieData => {
+              return {
+                id: movieData.episode_id,
+                title: movieData.title,
+                openingText: movieData.opening_crawl,
+                releaseDate: movieData.release_date
+              }
+            }
+          );
+          setMovies(transformedMovies);
+          }
+          catch(error){
+            setError(error.message);
+          }
+        setLoading(false);
+      }
+
+      let content = <p>No movies were found</p>
+      if(error)
+        content = <p>{error}</p>
+      else if(loading)
+        content = <p>Loading....</p>
+      else if(movies.length===0)
+        content = <p>No movies were found</p>
+      else
+        content = <MoviesList movies={movies}/>
+
+      return (
+        <>
+          <section>
+            <button onClick={fetchMoviesHandlder}>Fetch Movies</button>
+          </section>
+          <section>{content}</section>
+        </>
+      );
+    }
+
+    export default App;
+  ```
+- In our previous example, we can use the `useEffect()` hook to load the movies by call the `fetchMoviesHandler` function inside the `useEffect()`
+- While with this the application should work as intended, the `fetchMoviesHanlder` function is an object which can change on next re-render, so we should add it in a `useCallBack` so that it doesn't change every single time and causes infinite re-renders of the page.
+- `fetchMoviesHandler` function only has the `setState` functions as dependencies and the react library makes sure that these functions stay consistent, so these function don't need to be added into the dependencies array of the `useCallBack()` function.
+- We have created a simple firebase database/ rest api which we can post our movies to and fetch the data from
+- below is the example of the simple post function using the `fetch()` api
+- ```jsx
+    const addMovieHandler = async (movie)=> {
+      const response = await fetch('https://http-post-demo-1a35c-default-rtdb.firebaseio.com/movies.json',{
+      method: 'POST',
+      body : JSON.stringify(movie),
+      headers: {
+        'Content-Type':'application/json'
+      }
+      }
+      );
+      const data = await response.json();
+      console.log(data);
+    }
+  ```
+- Here's how the whole example should look now along with the `fetch()` for getting the data
+- ```jsx
+  import React, { useState, useEffect, useCallback } from 'react';
+  import MoviesList from './components/MoviesList';
+  import AddMovie from './components/AddMovie';
+  import './App.css';
+  function App() {
+    const [movies, setMovies] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchMoviesHandler = useCallback(async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('https://http-post-demo-1a35c-default-rtdb.firebaseio.com/movies.json'
+        );
+        if (!response.ok) {
+          throw new Error('Something went wrong!');
+        }
+
+        const data = await response.json();
+
+        const transformedMovies = [];
+
+        for(let key in data){
+          transformedMovies.push({
+            id: key,
+            title: data[key].title,
+            releaseDate: data[key].releaseDate,
+            openingText: data[key].openingText
+          });
+        }
+
+        setMovies(transformedMovies);
+      } catch (error) {
+        setError(error.message);
+      }
+      setIsLoading(false);
+    }, []);
+
+    useEffect(() => {
+      fetchMoviesHandler();
+    }, [fetchMoviesHandler]);
+
+    const addMovieHandler = async (movie)=> {
+      const response = await fetch('https://http-post-demo-1a35c-default-rtdb.firebaseio.com/movies.json',{
+      method: 'POST',
+      body : JSON.stringify(movie),
+      headers: {
+        'Content-Type':'application/json'
+      }
+      }
+      );
+      const data = await response.json();
+      console.log(data);
+    }
+
+    let content = <p>Found no movies.</p>;
+
+    if (movies.length > 0) {
+      content = <MoviesList movies={movies} />;
+    }
+
+    if (error) {
+      content = <p>{error}</p>;
+    }
+
+    if (isLoading) {
+      content = <p>Loading...</p>;
+    }
+
+    return (
+      <React.Fragment>
+        <section>
+          <AddMovie onAddMovie={addMovieHandler} />
+        </section>
+        <section>
+          <button onClick={fetchMoviesHandler}>Fetch Movies</button>
+        </section>
+        <section>{content}</section>
+      </React.Fragment>
+    );
+  }
+
+  export default App;
+
+  ```
+- 
