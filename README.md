@@ -1689,4 +1689,244 @@
   export default App;
 
   ```
+- ## Custom Hooks
+- Custom hooks can be used to refactor the code which is being duplicated a lot but is using hooks.
+- As hooks can't be used in regular javascript functions and only react component functions, it's not possible to reuse the code with hooks declarations and hooks calls by using a normal function.
+- Instead what can be done is creating a custom hook with use prefix in naming convention.
+- Consider the below React component which uses hooks.
+- ```jsx
+  import { useState, useEffect } from 'react';
+  import Card from './Card';
+
+  const BackwardCounter = () => {
+    const [counter, setCounter] = useState(0);
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCounter((prevCounter) => prevCounter - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, []);
+
+    return <Card>{counter}</Card>;
+  };
+
+  export default BackwardCounter;
+  ```
+- If we had another counter which was moving in the forward directions, we would have to duplicate the code in another function.
+- Instaed we can create a custom `useCounter` hook
+- ```jsx
+  //use counter hook
+  import {useEffect, useState} from 'react';
+  const useCounter = ()=>{
+      const [counter, setCounter] = useState(0);
+
+      useEffect(() => {
+          const interval = setInterval(() => {
+          setCounter((prevCounter) => prevCounter - 1);
+          }, 1000);
+
+          return () => clearInterval(interval);
+      }, []);
+
+      return counter;
+  }
+
+  export default useCounter;
+  ```
+- And it can be called in the component just like a regular hook
+- ```jsx
+  import Card from './Card';
+  import useCounter from '../hooks/use-counter'
+  const BackwardCounter = () => {
+    const counter = useCounter();
+    return <Card>{counter}</Card>;
+  };
+
+  export default BackwardCounter;
+  ```
+- A custom hook can return any kind of value, so you can return an array with all the values you want to.
+- A custom hook wil create separate states for different components it will be called in, so we won't be reusing the same state in different components by calling it mulitiple times.
+- Though we should be able to pass the functions returned by the custom hook in props to alter the state from another component if that's what we want to do.
+- ## Accepting parameters in the custom hook
+- Just like any other hook or function in java script, custom hooks can also accept parameters
+- And we can just these parameters to achieve different functionality.
+- For example, we can add a flag to our previously created custom hook to make sure that it works in both the directions if needed.
+- ```jsx
+  //use counter with parameter
+  import {useEffect, useState} from 'react';
+  const useCounter = (moveForward = true)=>{
+      const [counter, setCounter] = useState(0);
+
+      useEffect(() => {
+          const interval = setInterval(() => {
+          
+          if(moveForward){
+              setCounter((prevCounter) => prevCounter + 1);
+          }
+          else{
+              setCounter((prevCounter) => prevCounter - 1);
+          }
+
+          }, 1000);
+
+          return () => clearInterval(interval);
+      }, [moveForward]);
+
+      return counter;
+  }
+
+  export default useCounter;
+  ```
+- ```jsx
+  //backward counter
+  import Card from './Card';
+  import useCounter from '../hooks/use-counter'
+  const BackwardCounter = () => {
+    const counter = useCounter(false);
+    return <Card>{counter}</Card>;
+  };
+
+  export default BackwardCounter;
+  ```
+- ```jsx
+  //forward counter
+  import useCounter from '../hooks/use-counter';
+  import Card from './Card';
+
+  const ForwardCounter = () => {
+    const counter = useCounter();
+    return <Card>{counter}</Card>;
+  };
+
+  export default ForwardCounter;
+  ```
+- Consider the following custom react hook which can be used to make http requests and handle them.
+- ```jsx
+      //custom http hook
+      import { useCallback, useState } from "react";
+      const useHttp = ()=>{
+      const [isLoading, setIsLoading] = useState(false);
+      const [error, setError] = useState(null);
+      const sendRequest = useCallback(async (requestConfig,applyData) => {
+          setIsLoading(true);
+          setError(null);
+          try {
+          console.log(requestConfig);
+          const response = await fetch(
+              requestConfig.url,{
+                  method: requestConfig.method ? requestConfig.method : 'GET',
+                  headers: requestConfig.headers ? requestConfig.headers : {},
+                  body: requestConfig.body?JSON.stringify(requestConfig.body): null
+              }
+          );
+
+          if (!response.ok) {
+              throw new Error('Request failed!');
+          }
+
+          const data = await response.json();
+          applyData(data);
+          } catch (err) {
+          setError(err.message || 'Something went wrong!');
+          }
+          setIsLoading(false);
+      }
+  ,[]);
+      return {
+          isLoading,
+          error,
+          sendRequest
+      }
+  }
+
+
+  export default useHttp;
+  ```
+- this custom react hook returns an object which consists of 2 state values `isLoading` and `error`
+- it also returns a function which takes two parameters, one is an object which has the request configuration and the other parameter is a second function which takes the fetched json response as a parameter and can then apply any logic to it.
+- *here we use our custom react hook for a get request*
+- ```jsx
+    import React, { useEffect, useState } from 'react';
+    import useHttp from './hooks/use-http';
+    import Tasks from './components/Tasks/Tasks';
+    import NewTask from './components/NewTask/NewTask';
+
+    function App() {
+      const [tasks, setTasks] = useState([]);
+      const loadTasks = (data)=>{
+          const loadedTasks = [];
+
+          for (const taskKey in data) {
+            loadedTasks.push({ id: taskKey, text: data[taskKey].text });
+          }
+
+          setTasks(loadedTasks);
+      }
+      const {isLoading,error,sendRequest: fetchTasks}=useHttp();
+
+      useEffect(() => {
+        fetchTasks({url: 'https://http-post-demo-1a35c-default-rtdb.firebaseio.com/tasks.json'},loadTasks);
+      }, [fetchTasks]);
+
+      const taskAddHandler = (task) => {
+        setTasks((prevTasks) => prevTasks.concat(task));
+      };
+
+      return (
+        <React.Fragment>
+          <NewTask onAddTask={taskAddHandler} />
+          <Tasks
+            items={tasks}
+            loading={isLoading}
+            error={error}
+            onFetch={fetchTasks}
+          />
+        </React.Fragment>
+      );
+    }
+
+  export default App;
+  ```
+- *using the custom react hook for a post request*
+- ```jsx
+  import Section from '../UI/Section';
+  import TaskForm from './TaskForm';
+  import useHttp from '../../hooks/use-http';
+
+  const NewTask = (props) => {
+    
+    const {isLoading, error,sendRequest: sendTaskRequest}=useHttp();
+
+    const loadData = (taskText,data)=>{
+      const generatedId = data.name; // firebase-specific => "name" contains generated id
+      const createdTask = { id: generatedId, text: taskText };
+      props.onAddTask(createdTask);
+    }
+
+    const enterTaskHandler = async (taskText) => {
+
+      sendTaskRequest({url:'https://http-post-demo-1a35c-default-rtdb.firebaseio.com/tasks.json',
+      method : 'POST',
+      headers:{
+        'Content-Type': 'application/json',
+      },
+      body: {text: taskText}
+    },loadData.bind(null,taskText));
+    }
+
+    return (
+      <Section>
+        <TaskForm onEnterTask={enterTaskHandler} loading={isLoading} />
+        {error && <p>{error}</p>}
+      </Section>
+    );
+  };
+
+  export default NewTask;
+  ```
+- Note that while the apply data function which is one of the parameters of sendRequest function return by the hook accepts only one argument, we could create a two argument function, bind one argument to it and then pass it, that way we could pass only one argument to it in our custom hook function and pass the tasks as needed.
+- Alternately, we could just nest the function or pass a lambda function instead.
+- ## Form handling in React.
 - 
